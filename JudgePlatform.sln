@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JudgePlatform", "JudgePlatform\JudgePlatform.csproj", "{EEB96744-F52F-42D1-AF22-3963145B072D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D18ADB28-DF8A-4192-9657-46D9E46CF24F} = {D18ADB28-DF8A-4192-9657-46D9E46CF24F}
+		{F834AAE3-E598-472A-9291-0480F27A79F3} = {F834AAE3-E598-472A-9291-0480F27A79F3}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StringParse", "StringParse\StringParse.vcxproj", "{D18ADB28-DF8A-4192-9657-46D9E46CF24F}"
@@ -15,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FileComparator", "FileComparator\FileComparator.vcxproj", "{F834AAE3-E598-472A-9291-0480F27A79F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +53,18 @@ Global
 		{D18ADB28-DF8A-4192-9657-46D9E46CF24F}.Release|x64.Build.0 = Release|x64
 		{D18ADB28-DF8A-4192-9657-46D9E46CF24F}.Release|x86.ActiveCfg = Release|Win32
 		{D18ADB28-DF8A-4192-9657-46D9E46CF24F}.Release|x86.Build.0 = Release|Win32
+		{F834AAE3-E598-472A-9291-0480F27A79F3}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{F834AAE3-E598-472A-9291-0480F27A79F3}.Debug|Any CPU.Build.0 = Debug|x64
+		{F834AAE3-E598-472A-9291-0480F27A79F3}.Debug|x64.ActiveCfg = Debug|x64
+		{F834AAE3-E598-472A-9291-0480F27A79F3}.Debug|x64.Build.0 = Debug|x64
+		{F834AAE3-E598-472A-9291-0480F27A79F3}.Debug|x86.ActiveCfg = Debug|Win32
+		{F834AAE3-E598-472A-9291-0480F27A79F3}.Debug|x86.Build.0 = Debug|Win32
+		{F834AAE3-E598-472A-9291-0480F27A79F3}.Release|Any CPU.ActiveCfg = Release|x64
+		{F834AAE3-E598-472A-9291-0480F27A79F3}.Release|Any CPU.Build.0 = Release|x64
+		{F834AAE3-E598-472A-9291-0480F27A79F3}.Release|x64.ActiveCfg = Release|x64
+		{F834AAE3-E598-472A-9291-0480F27A79F3}.Release|x64.Build.0 = Release|x64
+		{F834AAE3-E598-472A-9291-0480F27A79F3}.Release|x86.ActiveCfg = Release|Win32
+		{F834AAE3-E598-472A-9291-0480F27A79F3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -71,5 +71,9 @@ namespace JudgePlatform.Models
 		/// 系统异常。
 		/// </summary>
 		InternalException,
+		/// <summary>
+		/// 多种错误。
+		/// </summary>
+		MultipleError,
 	}
 }

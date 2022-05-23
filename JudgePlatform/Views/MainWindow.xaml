@@ -15,22 +15,19 @@
             <RowDefinition Height="55"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Menu Height="Auto" Background="White" IsEnabled="{Binding IsButtonEnabled}">
+        <Menu Height="Auto" Background="White">
             <MenuItem Header="工具">
-                <MenuItem Header="配置选项"/>
-                <MenuItem Header="测试数据生成器"/>
+                <MenuItem x:Name="ConfigButton" Header="配置选项" IsEnabled="{Binding IsButtonEnabled}" Click="ConfigButton_Click"/>
             </MenuItem>
             <MenuItem Header="说明">
                 <MenuItem Header="使用手册"/>
                 <Separator/>
                 <MenuItem Header="测试数据说明"/>
                 <MenuItem Header="评测结果说明"/>
-                <MenuItem Header="导出报告说明"/>
             </MenuItem>
             <MenuItem Header="关于">
                 <MenuItem Header="关于本程序"/>
-                <MenuItem Header="开源许可"/>
-                <MenuItem Header="制作团队"/>
+                <MenuItem Header="开源许可" Click="License_Click"/>
             </MenuItem>
         </Menu>
         <Grid Grid.Row="1">
@@ -43,7 +40,7 @@
             <TextBox Grid.Column="1" VerticalAlignment="Center" IsReadOnly="True" Text="{Binding SelectedFolderPath}"/>
             <Button Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Content=" 选择文件夹 " Command="{Binding SelectFolderCommand}" Margin="10" IsEnabled="{Binding IsButtonEnabled}"/>
         </Grid>
-        <DataGrid x:Name="dataGrid" Grid.Row="2" Margin="10 0 10 0" AutoGenerateColumns="False" IsReadOnly="True" ItemsSource="{Binding Codes}" GridLinesVisibility="None" CanUserResizeRows="False" CanUserDeleteRows="True" IsEnabled="{Binding IsButtonEnabled}">
+        <DataGrid x:Name="dataGrid" Grid.Row="2" Margin="10 0 10 0" AutoGenerateColumns="False" IsReadOnly="True" ItemsSource="{Binding Codes}" GridLinesVisibility="None" CanUserResizeRows="False" CanUserDeleteRows="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="代码文件路径" Binding="{Binding FilePath}" Width="*"/>
                 <DataGridTextColumn Header="测评状态　 " Binding="{Binding StatusMessage}" Width="Auto"/>
@@ -61,12 +58,12 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Button Content=" 添加代码文件 " Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" Command="{Binding AddCommand}" IsEnabled="{Binding IsButtonEnabled}"/>
-            <Button Content=" 移除选中文件 " Grid.Column="0" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left"  IsEnabled="{Binding IsButtonEnabled}"/>
+            <Button Content=" 移除选中文件 " x:Name="RemoveSelected" Grid.Column="0" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left"  IsEnabled="{Binding IsButtonEnabled}" Click="RemoveSelected_Click"/>
             <Button Content=" 评测所有代码 " Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Margin="10 0 0 0" Command="{Binding TestAllCodesCommand}" IsEnabled="{Binding IsButtonEnabled}"/>
-            <Button Content=" 评测选中项 " Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10 0 0 0" IsEnabled="{Binding IsButtonEnabled}"/>
+            <Button Content=" 评测选中项 " x:Name="TestSelected" Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10 0 0 0" IsEnabled="{Binding IsButtonEnabled}" Click="TestSelected_Click"/>
             <Button Content=" 评测未评测代码 " Grid.Column="1" Grid.Row="1" VerticalAlignment="Bottom" Margin="10 0 0 0" IsEnabled="{Binding IsButtonEnabled}" Command="{Binding TestNewCodesCommand}"/>
-            <Button Content=" 导出详细报告（MD） " Grid.Column="3" Grid.Row="0" VerticalAlignment="Center" IsEnabled="{Binding IsButtonEnabled}"/>
-            <Button Content=" 导出报告（CSV） " Grid.Column="3" Grid.Row="1" VerticalAlignment="Bottom" IsEnabled="{Binding IsButtonEnabled}"/>
+            <Button Content=" 导出详细报告（MD） " Grid.Column="3" Grid.Row="0" VerticalAlignment="Center" IsEnabled="{Binding IsButtonEnabled}" Command="{Binding ExportMdCommand}"/>
+            <Button Content=" 导出报告（CSV） " Grid.Column="3" Grid.Row="1" VerticalAlignment="Bottom" IsEnabled="{Binding IsButtonEnabled}" Command="{Binding ExportCsvCommand}"/>
         </Grid>
         <StatusBar Grid.Row="4" Height="Auto" Background="White">
             <StatusBarItem Content="{Binding Status}"/>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -19,14 +20,14 @@ namespace JudgePlatform.ViewModels
 		public MainWindowViewModel()
 		{
 			LocalService.InitializeLocalService();
-			Codes = new DataCollection<ISourceCode>();
+			Codes = new DataCollection<CppSourceCode>();
 			SelectFolderCommand = new RelayCommand(() =>
 			{
 				var openFileDialog = new CommonOpenFileDialog
 				{
 					IsFolderPicker = true,
 					Multiselect = false,
-					InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+					//InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
 					EnsurePathExists = true,
 					EnsureFileExists = true
 				};
@@ -37,29 +38,74 @@ namespace JudgePlatform.ViewModels
 				openFileDialog.Dispose();
 			});
 
-			TestAllCodesCommand = new RelayCommand(() =>
+			TestAllCodesCommand = new RelayCommand(async () =>
 			{
-				isButtonEnabled = false;
-				Status = "评测中";
+				IsButtonEnabled = false;
+				Status = "评测全部代码中";
+				foreach (CppSourceCode code in Codes)
+                {
+					code.JudgeStatus = JudgeStatus.Pending;
+					code.RaisePropertyChanged(nameof(code.StatusMessage));
+				}
+				RaisePropertyChanged(nameof(Codes));
 				LocalService.DoEvents();
 				foreach (CppSourceCode code in Codes)
 				{
-					code.Test();
+					await code.Test();
 				}
-				isButtonEnabled = true;
+				await Task.Run(() =>
+				{
+					while (true)
+					{
+						bool isFinished = true;
+						foreach (ISourceCode code in Codes)
+						{
+							if (code.JudgeStatus == JudgeStatus.Running || code.JudgeStatus == JudgeStatus.Pending || code.JudgeStatus == JudgeStatus.Compiling)
+							{
+								isFinished = false;
+							}
+						}
+						if (isFinished)
+                        {
+							break;
+                        }
+					}
+				});
+				IsButtonEnabled = true;
 				Status = "就绪";
 			});
 
-			TestNewCodesCommand = new RelayCommand(() =>
+			TestNewCodesCommand = new RelayCommand(async () =>
 			{
+				IsButtonEnabled = false;
+				Status = "评测未评测代码中";
 				foreach (CppSourceCode code in Codes)
 				{
 					if (code.JudgeStatus == JudgeStatus.Pending)
 					{
-						Thread thread = new Thread(() => { code.Test(); });
-						thread.Start();
+                        await code.Test();
 					}
 				}
+				await Task.Run(() =>
+				{
+					while (true)
+					{
+						bool isFinished = true;
+						foreach (ISourceCode code in Codes)
+						{
+							if (code.JudgeStatus == JudgeStatus.Running || code.JudgeStatus == JudgeStatus.Pending || code.JudgeStatus == JudgeStatus.Compiling)
+							{
+								isFinished = false;
+							}
+						}
+						if (isFinished)
+						{
+							break;
+						}
+					}
+				});
+				IsButtonEnabled = true;
+				Status = "就绪";
 			});
 
 			AddCommand = new RelayCommand(() =>
@@ -67,7 +113,7 @@ namespace JudgePlatform.ViewModels
 				var openFileDialog = new OpenFileDialog
 				{
 					Multiselect = true,
-					InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+					//InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
 					CheckFileExists = true,
 					CheckPathExists = true,
 					Filter = "C/C++ 源文件|*.c;*.cpp;*.cc;*.C;*.cxx;*.c++;*.cp|所有文件|*.*",
@@ -86,6 +132,131 @@ namespace JudgePlatform.ViewModels
 				RaisePropertyChanged(nameof(Codes));
 				Codes.RaiseCollectionChanged();
 			});
+
+			ExportMdCommand = new RelayCommand(() =>
+			{
+				var saveFileDialog = new SaveFileDialog
+				{
+					Filter = "MarkDown文件|*.md|所有文件|*.*",
+					AddExtension = true,
+					DefaultExt = "md",
+					CheckPathExists = true,
+					FileName = $"{DateTime.Now:yyyy-MM-dd.HH.mm.ss}",
+				};
+				if (saveFileDialog.ShowDialog() ?? false)
+				{
+					using (StreamWriter output = new StreamWriter(saveFileDialog.FileName, false, Encoding.Default))
+					{
+						output.WriteLine("# 评测报告\n");
+						output.WriteLine($"{DateTime.Now:yyyy年M月d日}\n");
+						output.WriteLine("## 摘要\n");
+						output.WriteLine("|路径|状态|得分|");
+						output.WriteLine("|---|---|---|");
+						foreach (CppSourceCode code in Codes)
+						{
+							output.Write($"|{code.FilePath}|{code.StatusMessage}|");
+							if (code.StatusList.Count == 0)
+							{
+								output.WriteLine("0|");
+							}
+							else
+							{
+								int countAll = code.StatusList.Count;
+								int countPassed = 0;
+								foreach (var status in code.StatusList)
+								{
+									if (status.status == JudgeStatus.Accepted)
+									{
+										countPassed++;
+									}
+								}
+								output.WriteLine($"{100 * (double)countPassed / countAll:0.}|");
+							}
+						}
+						output.WriteLine();
+						output.WriteLine("## 详细信息\n");
+						foreach (CppSourceCode code in Codes)
+						{
+							output.WriteLine($"### {code.FilePath}\n");
+							output.WriteLine($"**评测结果：**{code.StatusMessage}\n");
+							double score = 0;
+							if (code.StatusList.Count != 0)
+							{
+								int countAll = code.StatusList.Count;
+								int countPassed = 0;
+								foreach (var status in code.StatusList)
+								{
+									if (status.status == JudgeStatus.Accepted)
+									{
+										countPassed++;
+									}
+								}
+								score = 100.0 * countPassed / countAll;
+							}
+							output.WriteLine($"**得分：**{score:0.}\n");
+							if (code.StatusDetail != string.Empty)
+                            {
+								output.WriteLine($"**编译器输出信息：**\n");
+								output.WriteLine("```");
+								output.WriteLine(code.StatusDetail);
+								output.WriteLine("```\n");
+							}
+							if (code.StatusList.Count != 0)
+                            {
+								int index = 1;
+								output.WriteLine($"**数据点详情：**\n");
+								output.WriteLine("|序号|耗时|内存|状态|");
+								output.WriteLine("|---|---|---|---|");
+								foreach (var status in code.StatusList)
+								{
+									output.WriteLine($"|{index++}|{status.timeConsumption:0.} ms|{status.memoryConsumption:0.} KB|{LocalService.TranslateStatus(status.status)}|");
+								}
+								output.WriteLine();
+							}
+						}
+					}
+				}
+			});
+
+			ExportCsvCommand = new RelayCommand(() =>
+            {
+				var saveFileDialog = new SaveFileDialog
+				{
+					Filter = "CSV文件|*.csv|所有文件|*.*",
+					AddExtension = true,
+					DefaultExt = "csv",
+					CheckPathExists = true,
+					FileName = $"{DateTime.Now:yyyy-MM-dd.HH.mm.ss}",
+				};
+				if (saveFileDialog.ShowDialog() ?? false)
+                {
+					using (StreamWriter output = new StreamWriter(saveFileDialog.FileName, false, Encoding.Default))
+                    {
+						output.WriteLine("路径,状态,得分,");
+						foreach (CppSourceCode code in Codes)
+                        {
+							output.Write($"{code.FilePath},{code.StatusMessage},");
+							if (code.StatusList.Count == 0)
+                            {
+								output.WriteLine("0,");
+                            }
+							else
+                            {
+								int countAll = code.StatusList.Count;
+								int countPassed = 0;
+								foreach (var status in code.StatusList)
+                                {
+									if (status.status == JudgeStatus.Accepted)
+                                    {
+										countPassed++;
+                                    }
+                                }
+                                output.WriteLine($"{100 * (double)countPassed / countAll:0.}");
+                            }
+                        }
+                    }
+                }
+			});
 		}
 
 		public RelayCommand SelectFolderCommand { get; set; }
@@ -95,6 +266,10 @@ namespace JudgePlatform.ViewModels
 		public RelayCommand TestNewCodesCommand { get; set; }
 
 		public RelayCommand AddCommand { get; set; }
+
+		public RelayCommand ExportMdCommand { get; set; }
+
+		public RelayCommand ExportCsvCommand { get; set; }
 
 		private bool isButtonEnabled = true;
 
@@ -120,7 +295,7 @@ namespace JudgePlatform.ViewModels
 			}
 		}
 
-		public DataCollection<ISourceCode> Codes { get; set; }
+		public DataCollection<CppSourceCode> Codes { get; set; }
 
 		public string SelectedFolderPath
 		{
@@ -132,18 +307,5 @@ namespace JudgePlatform.ViewModels
 				RaisePropertyChanged(nameof(SelectedFolderPath));
 			}
 		}
-
-		//public void DoEvents()
-		//{
-		//	DispatcherFrame frame = new DispatcherFrame();
-		//	Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background,
-		//			new DispatcherOperationCallback(delegate (object f)
-		//			{
-		//				((DispatcherFrame)f).Continue = false;
-		//				return null;
-		//			}
-		//		), frame);
-		//	Dispatcher.PushFrame(frame);
-		//}
 	}
 }

@@ -1,6 +1,6 @@
 ﻿MIT License
 
-Copyright (c) 2022 夏锦熠
+Copyright (c) 2022 夏锦熠(Xia Jinyi), 刘苏锐(Liu Surui), 黄凯博(Huang Kaibo), 刘航宇(Liu Hangyu), 李旭桓(Li Xuhuan) & 周琦翔(Zhou Qixiang)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

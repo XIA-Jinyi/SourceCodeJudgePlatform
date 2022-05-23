@@ -9,7 +9,7 @@ namespace JudgePlatform.Models
 {
 	interface ISourceCode : INotifyPropertyChanged
 	{
-		void Test();
+		Task Test();
 
 		JudgeStatus JudgeStatus { get; set; }
 
