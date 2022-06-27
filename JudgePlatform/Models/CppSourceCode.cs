@@ -195,7 +195,7 @@ namespace JudgePlatform.Models
                                                 }
 												using (Process compareProcess = new Process())
                                                 {
-													compareProcess.StartInfo.FileName = @".\FileComparator.exe";
+													compareProcess.StartInfo.FileName = $@"{Directory.GetCurrentDirectory()}\FileComparator.exe";
 													compareProcess.StartInfo.UseShellExecute = false;
 													compareProcess.StartInfo.CreateNoWindow = true;
 													compareProcess.StartInfo.RedirectStandardError = true;
@@ -204,9 +204,23 @@ namespace JudgePlatform.Models
 													compareProcess.StartInfo.Arguments = $@"""{LocalService.TempFolderPath}\{guid}-out.txt"" ""{LocalService.TempFolderPath}\{guid}-stdout.txt""";
 													compareProcess.Start();
 													compareProcess.WaitForExit();
-													record.status = compareProcess.ExitCode == 0 ? JudgeStatus.Accepted : JudgeStatus.WrongAnswer;
+													//record.status = compareProcess.ExitCode == 0 ? JudgeStatus.Accepted : JudgeStatus.WrongAnswer;
+													switch (compareProcess.ExitCode)
+                                                    {
+														case 0:
+															record.status = JudgeStatus.Accepted;
+															break;
+														case 1:
+															record.status = JudgeStatus.WrongAnswer;
+															break;
+														case 2:
+															record.status = JudgeStatus.PresentationError;
+															break;
+														default:
+															record.status = JudgeStatus.InternalException;
+															break;
+													}
 												}
-												//record.status = JudgeStatus.Accepted;
                                             }
                                         }
                                         else
@@ -224,6 +238,7 @@ namespace JudgePlatform.Models
                                     {
                                         if (!targetProcess.HasExited)
                                             targetProcess.Kill();
+										targetProcess.WaitForExit();
                                     }
                                 }
                             }
@@ -253,10 +268,13 @@ namespace JudgePlatform.Models
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 JudgeStatus = JudgeStatus.InternalException;
-            }
+#if DEBUG
+				MessageBox.Show(ex.Message, "Exception", MessageBoxButton.OK, MessageBoxImage.Error);
+#endif
+			}
             finally
             {
                 RaisePropertyChanged(nameof(StatusMessage));

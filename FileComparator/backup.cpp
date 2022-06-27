@@ -11,11 +11,6 @@
 using namespace std;
 using namespace chrono;
 
-#define AC (0)
-#define WA (1)
-#define PE (2)
-#define ERROR (3)
-
 int main(int argc, char* argv[])
 {
 	//使用chrono 高精度计时
@@ -24,7 +19,7 @@ int main(int argc, char* argv[])
 	//异常信息_传参个数有误输出
 	if (argc != 3) {
 		cerr << "命令行格式错，请使用格式：\n程序名 文件名1 文件名2\n";
-		return ERROR;
+		return 1;
 	}
 
 	ifstream txt1, txt2;
@@ -35,13 +30,13 @@ int main(int argc, char* argv[])
 	if (!txt1.is_open()) {
 		cerr << "Error opening file " << argv[1];
 		txt1.clear();
-		return ERROR;
+		return 2;
 	}
 	if (!txt2.is_open()) {
 		cerr << "Error opening file " << argv[2];
 		txt1.clear();
 		txt2.clear();
-		return ERROR;
+		return 2;
 	}
 
 	stack<char> stack1, stack2;
@@ -80,11 +75,9 @@ int main(int argc, char* argv[])
 	int flag1 = 1;
 	int flag2 = 1;
 
-	while (!stack1.empty() && !stack2.empty())
-	{
+	while (!stack1.empty() && !stack2.empty()) {
 		//判断是否为空栈，是否是行末空格或者制表符
 		//小心行首为空行
-
 		while (flag1) {
 			if (!stack1.empty()) {
 				if ((stack1.top() == ' ') || (stack1.top() == '\t')) {
@@ -106,40 +99,9 @@ int main(int argc, char* argv[])
 		//考虑这种可能，第一行为空行，所以需要再次判断是否非空
 		if (!stack1.empty() && !stack2.empty()) {
 			//进行字符比对
-			if ((stack1.top()) != (stack2.top()))
-			{
-				char a = stack1.top();
-				char b = stack2.top();
-				while (!stack1.empty() && !stack2.empty())
-				{
-					while (!stack1.empty() && isspace(stack1.top()))
-					{
-						stack1.pop();
-					}
-					while (!stack2.empty() && isspace(stack2.top()))
-					{
-						stack2.pop();
-					}
-					if (stack1.empty() || stack2.empty())break;
-					if (stack1.top() != stack2.top())
-					{
-						cout << "error:" << "stack1:" << stack1.top() << "stack2:" << stack2.top() << endl;
-						return WA;
-					}
-					else
-					{
-						stack1.pop();
-						stack2.pop();
-					}
-				}
-
-				if ((!stack1.empty() && stack2.empty()) || (!stack2.empty() && stack1.empty())) {
-					cerr << "error";
-					return WA;
-				}
-				cerr << "格式错误：" << "stack1:" << a << "stack2:" << b << endl;
-
-				return PE;
+			if ((stack1.top()) != (stack2.top())) {
+				cerr << "error " << "stack1:" << stack1.top() << "stack2:" << stack2.top() << endl;
+				return 1;
 			}
 			else {
 				//遇到字符则说明可以不用判断行末空格了
@@ -166,15 +128,9 @@ int main(int argc, char* argv[])
 	}
 	//字符数对不上
 	if ((!stack1.empty() && stack2.empty()) || (!stack2.empty() && stack1.empty())) {
-		if ((stack1.empty() && isspace(stack2.top()) || (stack2.empty() && isspace(stack1.top()))))
-		{
-			cerr << "格式错误" << endl;
-			return PE;
-		}
 		cerr << "error";
-		return WA;
+		return 1;
 	}
-
 	//文件大小和字符数
 	//变量  行数，字节数，字符数
 	int byte_size = 0;
@@ -203,5 +159,5 @@ int main(int argc, char* argv[])
 	txt1.close();
 	txt2.close();
 	std::fclose(fp1);
-	return AC;
+	return 0;
 }

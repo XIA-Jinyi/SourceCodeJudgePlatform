@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:JudgePlatform.Views" xmlns:viewmodels="clr-namespace:JudgePlatform.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowViewModel}"
         mc:Ignorable="d"
-        Title="代码评测平台" MinHeight="400" MinWidth="500"
+        Title="代码评测平台" MinHeight="400" MinWidth="500" Height="600" Width="800"
+        ResizeMode="CanResizeWithGrip"
+        Icon="../Resources/logo.ico"
         Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
@@ -20,13 +22,10 @@
                 <MenuItem x:Name="ConfigButton" Header="配置选项" IsEnabled="{Binding IsButtonEnabled}" Click="ConfigButton_Click"/>
             </MenuItem>
             <MenuItem Header="说明">
-                <MenuItem Header="使用手册"/>
-                <Separator/>
-                <MenuItem Header="测试数据说明"/>
-                <MenuItem Header="评测结果说明"/>
+                <MenuItem x:Name="Manual" Header="使用手册" Click="Manual_Click"/>
             </MenuItem>
             <MenuItem Header="关于">
-                <MenuItem Header="关于本程序"/>
+                <MenuItem x:Name="About" Header="关于本程序" Click="About_Click"/>
                 <MenuItem Header="开源许可" Click="License_Click"/>
             </MenuItem>
         </Menu>

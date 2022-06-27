@@ -15,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="backup.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>

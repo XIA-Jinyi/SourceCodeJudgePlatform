@@ -45,11 +45,7 @@ namespace JudgePlatform.Services
                     xmlElem.InnerText = value;
                     rootElem.AppendChild(xmlElem);
                 };
-#if DEBUG
-                append("CppCompilerPath", @"C:\mingw64\bin\g++.exe");
-#else
-                append("CppCompilerPath", @".\mingw64\bin\g++.exe");
-#endif
+                append("CppCompilerPath", $@"{Directory.GetCurrentDirectory()}\mingw64\bin\g++.exe");
                 append("CppCompileArguments", @"<SOURCE> -o <OUTPUT>");
                 append("TimeLimit", "1000");
                 append("MemoryLimit", "65535");
@@ -147,7 +143,7 @@ namespace JudgePlatform.Services
         {
             using (Process process = new Process())
             {
-                process.StartInfo.FileName = @".\StringParse.exe";
+                process.StartInfo.FileName = $@"{Directory.GetCurrentDirectory()}\StringParse.exe";
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;
                 process.StartInfo.RedirectStandardError = true;

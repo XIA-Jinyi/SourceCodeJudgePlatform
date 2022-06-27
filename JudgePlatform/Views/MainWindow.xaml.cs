@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using JudgePlatform.Models;
 using JudgePlatform.ViewModels;
 using JudgePlatform.Services;
+using System.IO;
 
 namespace JudgePlatform.Views
 {
@@ -26,6 +27,9 @@ namespace JudgePlatform.Views
 		{
 			this.DataContext = viewModel;
 			InitializeComponent();
+#if DEBUG
+			MessageBox.Show(Directory.GetCurrentDirectory(), "工作目录");
+#endif
 		}
 
 		private MainWindowViewModel viewModel = new MainWindowViewModel();
@@ -37,8 +41,7 @@ namespace JudgePlatform.Views
 
         private void License_Click(object sender, RoutedEventArgs e)
         {
-			string license = @"
-MIT License
+			string license = @"MIT License
 
 Copyright (c) 2022 夏锦熠(Xia Jinyi), 刘苏锐(Liu Surui), 黄凯博(Huang Kaibo), 刘航宇(Liu Hangyu), 李旭桓(Li Xuhuan) & 周琦翔(Zhou Qixiang)
 
@@ -81,6 +84,27 @@ THE SOFTWARE IS PROVIDED ""AS IS"", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMP
 			//window.ShowInTaskbar = false;
 			window.ShowDialog();
 			viewModel.Status = "就绪";
+		}
+
+        private void Manual_Click(object sender, RoutedEventArgs e)
+        {
+			System.Diagnostics.Process.Start("msedge.exe", $@"""{Directory.GetCurrentDirectory()}/manual.html""");
+		}
+
+        private void About_Click(object sender, RoutedEventArgs e)
+        {
+			string info = @"代码评测平台
+
+版　　本：　1.0.0.0
+更新时间：　2022/06/28
+作　　者：　夏锦熠　刘苏锐　黄凯博　刘航宇　李旭桓　周琦翔
+项目主页：　https://github.com/XIA-Jinyi/SourceCodeJudgePlatform/
+
+本平台使用了开源的 MinGW-w64 项目。
+
+CopyRight (c) 2022
+";
+			MessageBox.Show(info, "关于");
 		}
     }
 }

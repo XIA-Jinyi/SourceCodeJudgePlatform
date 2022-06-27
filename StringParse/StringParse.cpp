@@ -1,14 +1,4 @@
-﻿/******************************************************************************
-* 
-* [FileName]    StringParse.cpp
-* 
-* [Author]      刘苏锐
-* 
-* [CreateDate]  2022/04/27
-* 
-******************************************************************************/
-
-#include<iostream>
+﻿#include<iostream>
 #include<string>
 #include<string.h>
 using namespace std;
