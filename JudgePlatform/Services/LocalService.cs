@@ -185,7 +185,7 @@ namespace JudgePlatform.Services
             Dispatcher.PushFrame(frame);
         }
 
-        public static string TranslateStatus(JudgeStatus status)
+        public static string InterpretJudgeStatus(JudgeStatus status)
         {
             switch (status)
             {

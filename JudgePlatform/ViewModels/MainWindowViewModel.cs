@@ -151,7 +151,7 @@ namespace JudgePlatform.ViewModels
 						output.WriteLine($"{DateTime.Now:yyyy年M月d日}\n");
 						output.WriteLine("## 摘要\n");
 						output.WriteLine("|路径|状态|得分|");
-						output.WriteLine("|---|---|---|");
+						output.WriteLine("| :--- | :---: | ---: |");
 						foreach (CppSourceCode code in Codes)
 						{
 							output.Write($"|{code.FilePath}|{code.StatusMessage}|");
@@ -178,7 +178,7 @@ namespace JudgePlatform.ViewModels
 						foreach (CppSourceCode code in Codes)
 						{
 							output.WriteLine($"### {code.FilePath}\n");
-							output.WriteLine($"**评测结果：**{code.StatusMessage}\n");
+							output.WriteLine($"__评测结果：__ {code.StatusMessage}\n");
 							double score = 0;
 							if (code.StatusList.Count != 0)
 							{
@@ -193,23 +193,23 @@ namespace JudgePlatform.ViewModels
 								}
 								score = 100.0 * countPassed / countAll;
 							}
-							output.WriteLine($"**得分：**{score:0.}\n");
+							output.WriteLine($"__得分：__ {score:0.}\n");
 							if (code.StatusDetail != string.Empty)
                             {
-								output.WriteLine($"**编译器输出信息：**\n");
+								output.WriteLine($"__编译器输出信息：__ \n");
 								output.WriteLine("```");
-								output.WriteLine(code.StatusDetail);
+								output.Write(code.StatusDetail);
 								output.WriteLine("```\n");
 							}
 							if (code.StatusList.Count != 0)
                             {
 								int index = 1;
-								output.WriteLine($"**数据点详情：**\n");
+								output.WriteLine($"__数据点详情：__ \n");
 								output.WriteLine("|序号|耗时|内存|状态|");
-								output.WriteLine("|---|---|---|---|");
+								output.WriteLine("| ---: | :--- | :--- | :---: |");
 								foreach (var status in code.StatusList)
 								{
-									output.WriteLine($"|{index++}|{status.timeConsumption:0.} ms|{status.memoryConsumption:0.} KB|{LocalService.TranslateStatus(status.status)}|");
+									output.WriteLine($"|{index++}|{status.timeConsumption:0.} ms|{status.memoryConsumption:0.} KB|{LocalService.InterpretJudgeStatus(status.status)}|");
 								}
 								output.WriteLine();
 							}
@@ -232,10 +232,10 @@ namespace JudgePlatform.ViewModels
                 {
 					using (StreamWriter output = new StreamWriter(saveFileDialog.FileName, false, Encoding.Default))
                     {
-						output.WriteLine("路径,状态,得分,");
+						output.WriteLine("路径,状态,得分");
 						foreach (CppSourceCode code in Codes)
                         {
-							output.Write($"{code.FilePath},{code.StatusMessage},");
+							output.Write($"\"{code.FilePath}\",{code.StatusMessage},");
 							if (code.StatusList.Count == 0)
                             {
 								output.WriteLine("0,");

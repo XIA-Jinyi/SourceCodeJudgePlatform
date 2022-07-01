@@ -29,29 +29,7 @@ namespace JudgePlatform.Models
 
 		public string StatusMessage
 		{
-			get
-			{
-				switch (JudgeStatus)
-				{
-					case JudgeStatus.Accepted: return "程序通过";
-					case JudgeStatus.WrongAnswer: return "答案错误";
-					case JudgeStatus.PresentationError: return "格式错误";
-					case JudgeStatus.CompileError: return "编译失败";
-					case JudgeStatus.RuntimeError: return "运行时错误";
-					case JudgeStatus.TimeLimitExceeded: return "运行超时";
-					case JudgeStatus.MemoryLimitExceeded: return "内存超限";
-					case JudgeStatus.OutputLimitExceeded: return "输出超限";
-					case JudgeStatus.Pending: return "等待评测";
-					case JudgeStatus.Compiling: return "正在编译";
-					case JudgeStatus.Running: return "正在运行";
-					case JudgeStatus.FileException: return "文件异常";
-					case JudgeStatus.CompileException: return "编译异常";
-					case JudgeStatus.TestException: return "数据异常";
-					case JudgeStatus.MultipleError: return "多种错误";
-					case JudgeStatus.InternalException: return "系统异常";
-					default: return "未知异常";
-				}
-			}
+			get => LocalService.InterpretJudgeStatus(JudgeStatus);
 		}
 
 		public string StatusDetail { get; set; }
@@ -72,7 +50,6 @@ namespace JudgePlatform.Models
 			Guid guid = Guid.NewGuid();
 			try
 			{
-				
 				var testDataList = LocalService.TestDataList;
 				if (!File.Exists(FilePath))
 				{
@@ -154,6 +131,7 @@ namespace JudgePlatform.Models
                                         targetProcess.StartInfo.RedirectStandardError = true;
                                         targetProcess.StartInfo.RedirectStandardOutput = true;
                                         targetProcess.StartInfo.RedirectStandardInput = true;
+										targetProcess.StartInfo.WorkingDirectory = $"{LocalService.TempFolderPath}";
                                         targetProcess.Start();
                                         targetProcess.StandardInput.WriteLine(testData.Item1);
                                         targetProcess.StandardInput.Flush();
@@ -272,7 +250,9 @@ namespace JudgePlatform.Models
             {
                 JudgeStatus = JudgeStatus.InternalException;
 #if DEBUG
-				MessageBox.Show(ex.Message, "Exception", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show(ex.Message, "Exception: Message", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show(LocalService.FindConfigEntry("CppCompilerPath"), "Exception: Check Compiler Path", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show($@"{LocalService.TempFolderPath}\{guid}.exe", "Exception: Check Output Path", MessageBoxButton.OK, MessageBoxImage.Error);
 #endif
 			}
             finally
